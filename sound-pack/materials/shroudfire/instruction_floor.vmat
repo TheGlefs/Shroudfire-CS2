@@ -1,0 +1,13 @@
+Layer0
+{
+	shader "generic.vfx"
+	TextureColor "[0.18 0.22 0.28 1.0]"
+	TextureRoughness "[1.0 1.0 1.0 1.0]"
+	g_vColorTint "[1.0 1.0 1.0 0.0]"
+	SystemAttributes
+	{
+		PhysicsSurfaceProperties "concrete"
+		WorldMappingWidth "128"
+		WorldMappingHeight "128"
+	}
+}

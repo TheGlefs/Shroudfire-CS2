@@ -1,0 +1,61 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+    shroudfire_movement_blocker =
+    {
+        operators =
+        [
+            {
+                name = "source"
+                operator = "game_get_source_info"
+            },
+            {
+                name = "event_info"
+                operator = "soundevent_get_info"
+            },
+            {
+                name = "valid_source"
+                operator = "math_float"
+                apply = "greater_than"
+                input1 = "@source.output_entity_index"
+                input2 = "0"
+            },
+            // Entity matching preserves sounds from Armitive and works with either team.
+            {
+                name = "steps"
+                operator = "soundevent_block"
+                input_execute = "@valid_source.output"
+                input_active = "@event_info.output_unstopped"
+                input_entity_index = "@source.output_entity_index"
+                match_event_name = ".Step"
+                match_substring = "1"
+                is_untimed = "1"
+            },
+            {
+                name = "jump"
+                operator = "soundevent_block"
+                input_execute = "@valid_source.output"
+                input_active = "@event_info.output_unstopped"
+                input_entity_index = "@source.output_entity_index"
+                match_event_name = "Default.WalkJump"
+                match_substring = "0"
+                is_untimed = "1"
+            },
+            {
+                name = "land"
+                operator = "soundevent_block"
+                input_execute = "@valid_source.output"
+                input_active = "@event_info.output_unstopped"
+                input_entity_index = "@source.output_entity_index"
+                match_event_name = "Land"
+                match_substring = "1"
+                is_untimed = "1"
+            },
+            // Keep the silent marker event alive until the plugin stops it.
+            {
+                name = "keep_alive"
+                operator = "soundevent_control"
+                input_add_dependent = "@event_info.output_unstopped"
+            },
+        ]
+    }
+}

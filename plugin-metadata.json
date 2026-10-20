@@ -1,0 +1,11 @@
+{
+  "name": "shroudfire",
+  "alias": "shroudfire",
+  "display_name": "Shroudfire",
+  "description": "Invisible, knife-wielding Invisant hunt armed Armitive",
+  "author": "TheGlefs",
+  "url": "https://shroudfire.com",
+  "log_tag": "SHROUDFIRE",
+  "license": "Apache-2.0",
+  "version": "1.0.0"
+}

@@ -1,0 +1,45 @@
+/build/
+/build-core/
+/.b/
+*.obj
+*.pdb
+__pycache__/
+
+# Generated packages and dependency checkouts
+/build-*/
+/.ambuild2/
+/dist/
+/deps/
+/.venv/
+/shroudfire-sound-pack-*.zip
+*.o
+*.a
+*.lib
+*.exp
+*.dll
+*.so
+*.dylib
+*.exe
+*.py[cod]
+
+# Local server state and credentials
+/addons/
+/data/
+/profiles/
+admins.txt
+*.sq3
+*.sqlite*
+*.db
+*.log
+*.dmp
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*-ssh-key
+*-ssh-key.pub
+
+# Local editor state
+/.vs/
+/.vscode/

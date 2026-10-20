@@ -1,0 +1,8 @@
+{
+  "server_dir": "/home/your-user/cs2-server",
+  "plugin_dir": "/home/your-user/Shroudfire",
+  "steamcmd": "/home/your-user/steamcmd/steamcmd.sh",
+  "ambuild": "/home/your-user/Shroudfire/.venv/bin/ambuild",
+  "session": "shroudfire",
+  "check_interval": 300
+}

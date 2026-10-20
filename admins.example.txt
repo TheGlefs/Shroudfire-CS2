@@ -1,0 +1,6 @@
+# Copy to addons/shroudfire/admins.txt and add one Steam64 ID per line.
+# generic permits status, cvar access, restart, next-map selection, and observation.
+# root includes generic access and permits setlevel and force Invisant/Armitive.
+# The plugin reads admins.txt when it loads; restart after changing administrator access.
+# 76561198000000000 generic
+# 76561198000000001 root

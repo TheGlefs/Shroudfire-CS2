@@ -1,0 +1,16 @@
+Layer0
+{
+	shader "csgo_unlitgeneric.vfx"
+	F_BLEND_MODE 1
+	F_DO_NOT_CAST_SHADOWS 1
+	g_tColor "materials/shroudfire/instruction_logo.vtex_c"
+	g_vColorTint "[1.0 1.0 1.0 0.0]"
+	g_nTextureAddressModeU "1"
+	g_nTextureAddressModeV "1"
+	SystemAttributes
+	{
+		PhysicsSurfaceProperties "concrete"
+		WorldMappingWidth "156"
+		WorldMappingHeight "104"
+	}
+}

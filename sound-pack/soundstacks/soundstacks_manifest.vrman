@@ -1,0 +1,22 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+    resourceManifest =
+    [
+        "soundstacks/soundstacks_core.vsndstck",
+    ]
+    resourceManifest1 =
+    [
+        "soundstacks/soundstacks_src1.vsndstck",
+        "soundstacks/soundstacks_diagnostics.vsndstck",
+        "soundstacks/soundstacks_examples.vsndstck",
+        "soundstacks/soundstacks_soundscapes_core.vsndstck",
+    ]
+    resourceManifest2 =
+    [
+        "soundstacks/soundstacks_csgo_mega.vsndstck",
+        "soundstacks/soundstacks_csgo_ambient.vsndstck",
+        "soundstacks/soundstacks_csgo_core.vsndstck",
+        "soundstacks/soundstacks_csgo_music.vsndstck",
+        "soundstacks/shroudfire_movement.vsndstck",
+    ]
+}
