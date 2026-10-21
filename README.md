@@ -1,47 +1,110 @@
-# Shroudfire
+# Shroudfire for Counter-Strike S2
 
-Shroudfire brings asymmetric combat to Counter-Strike 2: **Invisant** (*invisible assailants*) use invisibility and knives to eliminate **Armitive** (*armed fugitives*), who fight back with firearms or hold out until time runs out.
+Shroudfire is an asymmetric combat mode for **Counter-Strike 2**. **Invisant** (*invisible assailants*) hunt with invisibility and knives, while **Armitive** (*armed fugitives*) fight back with firearms or survive until time runs out. Roles rotate each round, and progression persists between sessions.
 
-Players rotate between roles each round, with separate XP, levels, and upgrades that persist between sessions. The mode runs as a native C++ MetaMod:Source plugin.
+This edition runs as a native C++ MetaMod:Source plugin. For the SourceMod edition, see [Shroudfire for Counter-Strike: Source](https://github.com/TheGlefs/Shroudfire-CSS).
 
-**Shroudfire was built using AI. To build it, change it, or update it, simply open this repository in an AI coding assistant and describe what you want.** See [Build or update with AI](#build-or-update-with-ai) for example prompts and the files to start with. Manual build instructions are included below.
+**Shroudfire was built using AI, but it is not slop. Great care was taken to get every detail right.** To build it, change it, or update it, open this repository in an AI coding assistant and describe what you want. See [Build or update with AI](#build-or-update-with-ai) for examples, or follow the manual build instructions below.
 
-[Play](#play) · [Host a server](#install-and-configure) · [Build](#build) · [Compatibility](#compatibility-and-known-limitations) · [Discord](https://discord.gg/TMV2DEPhqT)
+[How to play](#how-to-play) · [ESP and wallhacks](#esp-and-wallhacks) · [Upgrades](#upgrades) · [Chat shortcuts](#chat-shortcuts) · [Play](#play) · [Host a server](#install-and-configure) · [Build](#build) · [Discord](https://discord.gg/TMV2DEPhqT)
 
-## Gameplay
+## How to play
 
-| Role | Playstyle | Win condition |
-| --- | --- | --- |
-| **Invisant** | Stay invisible, close the distance, and attack with a knife. Movement upgrades, healing, and the Surge ability help you stay in combat. | Eliminate every Armitive. |
-| **Armitive** | Use firearms, watch for signs of the Invisant, and keep moving. Weapon upgrades, regeneration, and the Ward ability help you survive. | Eliminate every Invisant or survive until time runs out. |
+Rounds last two minutes by default, with a roster that scales toward four Armitive per Invisant. Each role has separate XP, levels up to 40, upgrade points, and persistent combat rankings. The descriptions below use the supplied server defaults. Server settings can change the round length and role ratio.
 
-Rounds last two minutes by default. The roster scales toward a maximum of four Armitive per Invisant, so larger games can have several Invisant. Invisant use Counter-Terrorists by default; server settings control the team, ratio, and round length.
+### Invisant
 
-Roles rotate through a queue. Killing an Invisant earns priority for the next round; otherwise, eligible players who have waited longest get their turn. Suicide and inactivity can affect eligibility.
+Invisible, knife-only. Armitive cannot hear your footsteps. Kill all Armitive to win. Knife: 60-degree cone, 72 units of reach, 50-75 raw damage per hit by default. Server settings can change the cone, reach, damage bounds, and attack speed.
 
-Kills, qualifying damage assists, and round wins earn XP. Each role has its own progression up to level 40, upgrade points, and persistent combat ranking. Each upgrade has five stages:
+No backstab bonus; knife attacks at 66% of normal speed. Track living Armitive through walls and take no fall damage.
 
-| Invisant upgrades | Armitive upgrades |
+After 60s of live play, 45s without dealing or taking damage starts `Starvation`. You lose 1 HP/s, increasing to 3 HP/s after 20s of continuous starvation. Starting at full health at 1:00, you die with roughly 0:15 remaining unless combat resets it. Server settings can change the delays, damage, and tick intervals.
+
+### Armitive
+
+Find the Invisant with firearms, blood, and contact. The default purchase restriction blocks the `M249`; administrators can change the list. Armitive win if anyone survives the round timer.
+
+Headshot damage to Invisant is halved and capped at 90. One headshot cannot kill a full-health Invisant.
+
+Move at least 256 units from your tracked position to avoid camping. A warning starts after 20s; after another 10s, you lose 10 HP/s until you move away. Server settings can change the movement distance, warning and damage delays, and damage per second.
+
+### Rotation
+
+Roles rotate each round. An Armitive who kills an Invisant gets priority to become Invisant next round.
+
+Otherwise, the longest-waiting eligible player becomes Invisant. Suicide forfeits next-round eligibility.
+
+### Progression
+
+Kills, qualifying damage assists, and completed-round wins grant separate Invisant and Armitive XP. Server settings can change XP rewards, assist requirements, and the level progression curve.
+
+As Armitive, knife kills earn 150% kill XP; pistol kills, 125%. Levels grant upgrade points. In chat, type `upgrade` for effects, `menu` to spend points, or `reset` to refund them.
+
+### Kill streaks
+
+In 2v2+ rounds, the first enemy kill earns `First Blood`: 125% kill XP. Your second kill within 10s of the last earns 120%.
+
+Each later kill within 10s of your last adds 10% kill XP, up to 200% on your tenth kill. Only you hear the sounds. Server settings can change the streak window and XP bonuses.
+
+### Rank
+
+Type `rank` for your Armitive and Invisant statistics and ranks. Kills after the round ends grant no XP, rank, or role priority.
+
+Default timeout behavior reveals surviving Invisant during the round transition. Servers can choose to kill them instead. Type `bugs` for known limitations.
+
+## ESP and wallhacks
+
+Invisant are not made transparent. During the hunt, the server does not send Invisant players, or their weapon and movement sounds, to Armitive computers.
+
+ESP and wallhacks can only show data a computer receives. With no Invisant player data, they cannot reveal or track an Invisant.
+
+Missed knife swings and wall impacts remain audible clues. Server settings control whether these sounds are enabled. Surviving Invisant may be deliberately revealed after timeout.
+
+Armitive still see blood and bullet impacts, and hear damage sounds.
+
+## Upgrades
+
+Each role has eight upgrades, with five stages per upgrade. Unlocks use your level in that role. Server settings can change unlock levels, upgrade effects, regeneration intervals, and the purchase window.
+
+### Unlocks
+
+Normal stages unlock at role levels 1, 5, 10, 15 and 20.
+
+Ultimate stages unlock at role levels 8, 16, 24, 32 and 40.
+
+Type `menu` to spend points or `reset` to refund them.
+
+Changes apply immediately in the opening 20s, then next round afterward.
+
+### Armitive
+
+| Upgrade | Effect |
 | --- | --- |
-| Lightweight, Momentum, Resilience, Reforging, Vampirism, Bloodlust, Mobility, **Surge** | Fortitude, Recovery, Overload, Stockpile, Barrage, Control, Dexterity, **Ward** |
+| **Fortitude** | Gain 10 maximum health per stage. |
+| **Recovery** | Restore 1 health per stage every 3 seconds. |
+| **Overload** | Gain 10% extra magazine capacity per stage. |
+| **Stockpile** | Gain 1 extra reserve ammo clip per stage. |
+| **Barrage** | Gain 7% faster weapon fire rate per stage. |
+| **Control** | Gain 10% less recoil and bullet spread per stage. |
+| **Dexterity** | Gain 12% less weapon switch and reload time per stage. |
+| **Ultimate: Ward** | Press E for 2 seconds of immunity at 1/5, plus 0.5 seconds per later stage. |
 
-After buying an ultimate upgrade, press your **Use key** (normally **E**) to activate it. Surge launches an Invisant in the aim direction; Ward temporarily shields an Armitive. Purchases and resets apply immediately during the opening purchase window and next round afterward.
+### Invisant
 
-Invisant take no fall damage, cannot buy or pick up normal firearms, and can see living Armitive through walls when outlines are enabled. Their knife deals a configurable 50–75 damage per hit and attacks at 66% of the normal rate by default. Armitive purchases use a configurable blocked-weapons list, which defaults to M249. AFK handling, Invisant starvation, and Armitive camping damage keep rounds moving. Starvation defaults to a 60-second live-round delay and 45 seconds without dealing or taking damage: 1 HP per second initially, then 3 HP per second after 20 seconds of starvation. A full-health Invisant that starts starving at 1:00 dies at roughly 0:15 remaining in a two-minute round. All seven starvation settings are configurable in the [command reference](COMMANDS.md#invisant-starvation).
+| Upgrade | Effect |
+| --- | --- |
+| **Lightweight** | Gain 10% less gravity per stage. |
+| **Momentum** | Gain 3% faster run speed per stage. |
+| **Resilience** | Gain 15 armor per stage and helmet at 5/5. |
+| **Reforging** | Gain 1 armor per stage every 3 seconds. |
+| **Vampirism** | Gain 3 health per stage when dealing damage. |
+| **Bloodlust** | Gain 6 health per stage when killing an enemy. |
+| **Mobility** | Gain 15% faster crouching speed per stage. |
+| **Ultimate: Surge** | Press E for a 480 unit speed boost at 1/5, increased by 30 per later stage. |
 
-## Play
+## Chat shortcuts
 
-Connect from the CS2 developer console:
-
-```text
-connect cs2.shroudfire.com
-```
-
-You can also add `cs2.shroudfire.com` to Favorites in the Community Server Browser. The Workshop map `shroudfire_launch` displays joining instructions; playing the mode requires joining a Shroudfire server.
-
-The first player starts as Armitive. Joining an empty server starts one fresh round promptly, without freezing the player beforehand or restarting again after warmup.
-
-Once connected, type these shortcuts in chat:
+Type these in chat without a prefix:
 
 | Chat text | Action |
 | --- | --- |
@@ -55,9 +118,34 @@ Once connected, type these shortcuts in chat:
 | `cheat` | Open the visibility and anti-cheat guide. |
 | `close` | Close an open upgrade menu or guide. |
 
-Use **A/D** to change pages, **W/S** to choose an option, and **SPACE** to select, whether alive or dead. On an informational guide page, SPACE jumps to its options. **R** jumps to the final page with Exit Menu selected; press SPACE to exit, or type `close`. Release a key before pressing it again. An open panel takes priority over spectator controls while dead.
+### Menu controls
 
-The upgrade menu also accepts `1`–`8` in chat. Enter `sf_level` in your console to see both roles' XP and levels. The [full command reference](COMMANDS.md) covers administrator commands, menu behavior, rankings, and every server setting.
+The same controls work while alive or dead. Release each key before pressing it again.
+
+| Key | Action |
+| --- | --- |
+| A / D | Change pages. |
+| W / S | Choose an option. |
+| SPACE | Select. On an informational guide page, jump to its options. |
+| R | Jump to the final page with Exit Menu selected; press SPACE to exit. |
+
+An open panel takes priority over spectator controls while dead. The upgrade menu also accepts `1`–`8` in chat. Enter `sf_level` in your console to see both roles' XP and levels.
+
+`audio` provides eight persistent toggles: Round Start, Round End, Kill Streak, Starvation, Timeout, Camping, AFK, and Menu. Settings follow you across roles and sessions.
+
+See [COMMANDS.md](COMMANDS.md) for the full command reference, administrator access, menu behavior, rankings, and server settings.
+
+## Play
+
+Connect from the CS2 developer console:
+
+```text
+connect cs2.shroudfire.com
+```
+
+You can also add `cs2.shroudfire.com` to Favorites in the Community Server Browser. The Workshop map `shroudfire_launch` displays joining instructions; playing the mode requires joining a Shroudfire server.
+
+The first player starts as Armitive. Joining an empty server starts a fresh round promptly.
 
 ## Install and configure
 
@@ -159,7 +247,7 @@ python ../configure.py -s cs2 --targets=x86_64 --enable-optimize --mms_path=../d
 ambuild
 ```
 
-The package under `build/package/cs2` contains the platform's plugin binary, MetaMod VDF, example administrator file, and license notices:
+The package under `build/package/cs2` contains the platform's plugin binary, MetaMod VDF, example administrator file, and license notices, including the Valve linking exception:
 
 | Platform | Plugin binary within the package |
 | --- | --- |
