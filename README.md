@@ -1,4 +1,4 @@
-# Shroudfire for Counter-Strike S2
+# Shroudfire for Counter-Strike 2
 
 Shroudfire is an asymmetric combat mode for **Counter-Strike 2**. **Invisant** (*invisible assailants*) hunt with invisibility and knives, while **Armitive** (*armed fugitives*) fight back with firearms or survive until time runs out. Roles rotate each round, and progression persists between sessions.
 
@@ -50,7 +50,7 @@ Each later kill within 10s of your last adds 10% kill XP, up to 200% on your ten
 
 Type `rank` for your Armitive and Invisant statistics and ranks. Kills after the round ends grant no XP, rank, or role priority.
 
-Default timeout behavior reveals surviving Invisant during the round transition. Servers can choose to kill them instead. Type `bugs` for known limitations.
+Default timeout behavior reveals surviving Invisant during the round transition. Servers can choose to kill them instead.
 
 ## ESP and wallhacks
 
