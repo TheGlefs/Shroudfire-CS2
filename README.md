@@ -228,6 +228,6 @@ For load errors, Steam registration, launch options, and update recovery, see [L
 
 ## License and credits
 
-Original Shroudfire source code and assets are licensed under [Apache-2.0](LICENSE), except where a separate notice applies. The 51 voice MP3s and their converted copies are excluded and governed by [the voice-file terms](sound-pack/SOUNDS-LICENSE.md). See [NOTICE](NOTICE) for copyright and scope notices.
+Original Shroudfire source code and assets are licensed under [GNU GPL version 3 only (GPL-3.0-only)](LICENSE), with the [Valve linking exception](LICENSE-EXCEPTION), except where a separate notice applies. The 51 voice MP3s and their converted copies are excluded and governed by [the voice-file terms](sound-pack/SOUNDS-LICENSE.md). See [NOTICE](NOTICE) for copyright and scope notices. When distributing plugin binaries, provide their complete corresponding source, including build scripts, as required by GPLv3. Valve components remain subject to their own terms.
 
 The native project started from AlliedModders' Source 2 MetaMod sample; its notice is retained in [third-party/metamod-source-LICENSE.txt](third-party/metamod-source-LICENSE.txt). Third-party components remain subject to their own licenses.

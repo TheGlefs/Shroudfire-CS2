@@ -6,6 +6,6 @@
   "author": "TheGlefs",
   "url": "https://shroudfire.com",
   "log_tag": "SHROUDFIRE",
-  "license": "Apache-2.0",
+  "license": "GPL-3.0-only with Valve linking exception",
   "version": "1.0.0"
 }

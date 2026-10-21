@@ -52,6 +52,7 @@ addons/metamod/shroudfire.vdf
 addons/shroudfire/bin/linuxsteamrt64/shroudfire.so
 addons/shroudfire/admins.example.txt
 addons/shroudfire/LICENSE
+addons/shroudfire/LICENSE-EXCEPTION
 addons/shroudfire/NOTICE
 addons/shroudfire/third-party/metamod-source-LICENSE.txt
 ```

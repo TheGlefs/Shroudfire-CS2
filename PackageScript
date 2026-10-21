@@ -112,6 +112,7 @@ for task in MMSPlugin.tasks:
 for package in packages.values():
   package.addFile('admins.example.txt')
   package.addFile('LICENSE')
+  package.addFile('LICENSE-EXCEPTION')
   package.addFile('NOTICE')
   package.addFile('third-party/metamod-source-LICENSE.txt',
                   'third-party/metamod-source-LICENSE.txt')

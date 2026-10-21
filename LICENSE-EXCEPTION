@@ -1,0 +1,23 @@
+Shroudfire - Valve linking exception
+Additional permission under GNU GPL version 3 section 7
+
+Copyright 2026 TheGlefs
+
+As an additional permission, the Shroudfire copyright holder permits you to
+link or combine Shroudfire, including modified versions, with Counter-Strike 2,
+the Valve Source 2 engine, and Valve SDK code and libraries used to build or
+run this plugin, and to convey the resulting work.
+
+You must obey the GNU General Public License version 3 in all respects for
+Shroudfire and all other code covered by that license. This includes providing
+the corresponding source for the GPL-covered code when required by the GPL.
+Valve components remain subject to their own licenses. This permission does
+not grant rights to Valve components or waive their license requirements.
+
+This permission applies only to code whose copyright holders have granted it.
+It does not grant an exception for third-party code licensed separately.
+
+If you modify Shroudfire, you may extend this permission to your modifications,
+but you are not obligated to do so. You may remove this additional permission
+under GNU GPL version 3 section 7; if you do, update the license notices for
+your version accordingly.

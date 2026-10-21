@@ -1,8 +1,10 @@
 Shroudfire
 Copyright 2026 TheGlefs
 
-Licensed under the Apache License, Version 2.0. See LICENSE.
+Licensed under the GNU General Public License, version 3 only (GPL-3.0-only).
+See LICENSE for the full terms and LICENSE-EXCEPTION for the additional
+permission to link with Valve components.
 
 The MP3 files under sound-pack/sounds/shroudfire/ are excluded from the
-Apache License, Version 2.0. They were generated using an ElevenLabs free
+GNU General Public License. They were generated using an ElevenLabs free
 plan and are governed by sound-pack/SOUNDS-LICENSE.md.

@@ -2,9 +2,9 @@
 
 ## Scope
 
-This notice applies only to the 51 MP3 files under `sound-pack/sounds/shroudfire/`, including modified or converted copies of those files. Those files were generated using the ElevenLabs free plan. They are expressly excluded from the Apache License 2.0 in the repository root.
+This notice applies only to the 51 MP3 files under `sound-pack/sounds/shroudfire/`, including modified or converted copies of those files. Those files were generated using the ElevenLabs free plan. They are expressly excluded from the GNU General Public License version 3 in the repository root.
 
-The plugin source code and other original Shroudfire material remain covered by the repository's Apache License 2.0 unless a separate notice says otherwise. Third-party material remains subject to its owner's terms.
+The plugin source code and other original Shroudfire material remain covered by the repository's GNU General Public License version 3 only, with the Valve linking exception in `LICENSE-EXCEPTION`, unless a separate notice says otherwise. Third-party material remains subject to its owner's terms.
 
 ## Voice-file terms
 

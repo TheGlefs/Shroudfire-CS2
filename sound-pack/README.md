@@ -156,6 +156,6 @@ Preserve file encodings and existing asset names unless updating every reference
 
 ## Voice-file terms
 
-The MP3 sources and their modified or converted copies are excluded from the repository's Apache-2.0 license. Their [separate notice](SOUNDS-LICENSE.md) permits non-commercial use with attribution and the stated conditions. Retain that notice and the required publishing attribution when distributing the pack.
+The MP3 sources and their modified or converted copies are excluded from the repository's GPLv3 license. Their [separate notice](SOUNDS-LICENSE.md) permits non-commercial use with attribution and the stated conditions. Retain that notice and the required publishing attribution when distributing the pack.
 
 A later paid ElevenLabs subscription does not change the rights to these existing free-plan files. For commercial distribution, remove them or replace them with audio whose terms permit the intended use. Other original Shroudfire material remains covered by the project's license unless a separate notice applies.
