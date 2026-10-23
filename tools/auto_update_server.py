@@ -179,7 +179,9 @@ class ServerUpdater:
         deadline = time.monotonic() + 150
         while time.monotonic() < deadline:
             text = log.read_text(encoding='utf-8', errors='replace')
-            if 'engine adapter ready for this server build' in text and 'Host activate: Changelevel' in text:
+            adapter_ready = 'engine adapter ready for this server build' in text
+            map_active = re.search(r'^Host activate: (?:Loading|Changelevel)\b', text, re.M)
+            if adapter_ready and map_active:
                 self.console('sf_status')
                 time.sleep(0.5)
                 if '[Shroudfire] State: active' in self.capture():
