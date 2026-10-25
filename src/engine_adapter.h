@@ -68,9 +68,11 @@ public:
                                bool mode_active);
     void clear_round_ui_tracking() {
         html_game_rules_index_ = -1;
-        round_ui_was_live_ = false;
-        round_ui_captured_ = false;
-        round_end_count_before_ = 0;
+        round_end_count_native_ = 0;
+        round_start_count_native_ = 0;
+        round_end_no_music_native_ = false;
+        round_counts_presentation_active_ = false;
+        end_html_result_active_ = false;
         end_html_presentation_active_ = false;
         end_html_restart_time_ = 0.0f;
         end_html_game_restart_ = false;
@@ -169,6 +171,7 @@ public:
     void *damage_function() const { return take_damage_function_; }
     void *weapon_can_use_function() const { return weapon_can_use_function_; }
     void *can_acquire_function() const { return can_acquire_function_; }
+    void *increment_mvp_function() const { return increment_mvp_function_; }
     void *sound_filter_function() const { return sound_filter_function_; }
     void *game_event_manager_init_function() const { return game_event_manager_init_function_; }
     void *host_say_function() const { return host_say_function_; }
@@ -233,6 +236,8 @@ private:
         uint32_t restart_round_time = 0;
         uint32_t game_restart = 0;
         uint32_t round_end_count = 0;
+        uint32_t round_start_count = 0;
+        uint32_t round_end_no_music = 0;
         uint32_t buy_time_ended = 0;
         uint32_t ct_cant_buy = 0;
         uint32_t t_cant_buy = 0;
@@ -322,6 +327,7 @@ private:
     void *weapon_can_use_function_ = nullptr;
     void *can_acquire_function_ = nullptr;
     void *sound_filter_function_ = nullptr;
+    void *increment_mvp_function_ = nullptr;
     void *process_movement_function_ = nullptr;
     uint32_t ignore_armor_damage_flag_ = 0;
     void *set_player_pawn_function_ = nullptr;
@@ -349,10 +355,12 @@ private:
     std::unordered_map<uint32_t, RevealRenderState> original_reveal_rendering_;
     bool spawn_rotation_ok_ = false;
     bool html_restart_fields_ok_ = false;
-    bool round_end_count_field_ok_ = false;
-    bool round_ui_was_live_ = false;
-    bool round_ui_captured_ = false;
-    uint8_t round_end_count_before_ = 0;
+    bool round_presentation_fields_ok_ = false;
+    uint8_t round_end_count_native_ = 0;
+    uint8_t round_start_count_native_ = 0;
+    bool round_end_no_music_native_ = false;
+    bool round_counts_presentation_active_ = false;
+    bool end_html_result_active_ = false;
     bool end_html_presentation_active_ = false;
     float end_html_restart_time_ = 0.0f;
     bool end_html_game_restart_ = false;

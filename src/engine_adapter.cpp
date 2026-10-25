@@ -301,6 +301,7 @@ bool EngineAdapter::initialize(IGameResourceService *resources, ISchemaSystem *s
     weapon_can_use_function_ = nullptr;
     can_acquire_function_ = nullptr;
     sound_filter_function_ = nullptr;
+    increment_mvp_function_ = nullptr;
     process_movement_function_ = nullptr;
     ignore_armor_damage_flag_ = 0;
     set_player_pawn_function_ = nullptr;
@@ -442,8 +443,12 @@ bool EngineAdapter::initialize(IGameResourceService *resources, ISchemaSystem *s
                                            fields_.restart_round_time);
     html_restart_fields_ok_ &= schema_field(schema, "CCSGameRules", "m_bGameRestart",
                                             fields_.game_restart);
-    round_end_count_field_ok_ = schema_field(schema, "CCSGameRules", "m_nRoundEndCount",
-                                              fields_.round_end_count);
+    round_presentation_fields_ok_ = schema_field(schema, "CCSGameRules", "m_nRoundEndCount",
+                                                  fields_.round_end_count);
+    round_presentation_fields_ok_ &= schema_field(schema, "CCSGameRules", "m_nRoundStartCount",
+                                                   fields_.round_start_count);
+    round_presentation_fields_ok_ &= schema_field(schema, "CCSGameRules", "m_bRoundEndNoMusic",
+                                                   fields_.round_end_no_music);
     buy_rules_fields_ok_ = schema_field(schema, "CCSGameRules", "m_bBuyTimeEnded",
                                        fields_.buy_time_ended);
     buy_rules_fields_ok_ &= schema_field(schema, "CCSGameRules", "m_bCTCantBuy",
@@ -601,6 +606,10 @@ bool EngineAdapter::initialize(IGameResourceService *resources, ISchemaSystem *s
         0x48, 0x89, 0x4c, 0x24, -1, 0x55, 0x53, 0x56, 0x57,
         0x41, 0x54, 0x41, 0x55, 0x41, 0x56, 0x41, 0x57, 0x48, 0x8b, 0xec
     });
+    increment_mvp_function_ = find_signature(module, std::array {
+        0x40, 0x55, 0x57, 0x41, 0x57, 0x48, 0x8b, 0xec,
+        0x48, 0x81, 0xec, -1, -1, -1, -1, 0x48, 0x8b, 0x05
+    });
     sound_filter_function_ = find_signature(module, std::array<int, 17> {
         0x40, 0x53, 0x48, 0x83, 0xec, -1, 0x4c, 0x89, 0x4c, 0x24,
         -1, 0x48, 0x8b, 0xd9, 0x45, 0x8b, 0xc8
@@ -676,6 +685,11 @@ bool EngineAdapter::initialize(IGameResourceService *resources, ISchemaSystem *s
         0x41, 0x55, 0x41, 0x54, 0x49, 0x89, 0xcc, 0x53, 0x48, 0x89, 0xfb,
         0x48, 0x83, 0xec, 0x78
     });
+    increment_mvp_function_ = find_signature(module, std::array {
+        0x48, 0x8b, 0x05, -1, -1, -1, -1, 0x80, 0x78, -1, -1,
+        0x0f, 0x85, -1, -1, -1, -1, 0x55, 0x48, 0x89, 0xe5,
+        0x41, 0x57, 0x41, 0x56, 0x41, 0x55, 0x41, 0x54, 0x41, 0x89, 0xf4
+    });
     sound_filter_function_ = find_signature(module, std::array{
         0x55, 0x48, 0x89, 0xe5, 0x53, 0x48, 0x89, 0xfb, 0x48, 0x83, 0xec,
         -1, 0xe8, -1, -1, -1, -1, 0x48, 0x89, 0xd8, 0x48, 0x8b, 0x5d,
@@ -741,7 +755,7 @@ bool EngineAdapter::initialize(IGameResourceService *resources, ISchemaSystem *s
         0x48, 0x8d, 0x55, -1, 0x45, 0x89, 0xc4, 0xe8
     });
 #endif
-    if (!terminate_round_function_ ||
+    if (!terminate_round_function_ || !increment_mvp_function_ ||
         !remove_entity_function_ || !take_damage_function_ || !weapon_can_use_function_ || !can_acquire_function_ ||
         !create_entity_function_ || !dispatch_spawn_function_ ||
         !game_event_manager_init_function_ || !set_player_pawn_function_ ||
@@ -1461,7 +1475,8 @@ bool EngineAdapter::center_html(int slot, IGameEventManager2 *events, const char
 bool EngineAdapter::stabilize_center_html(float now, bool round_live,
                                          bool presentation_frame,
                                          bool win_html_active, bool mode_active) {
-    if (!mode_active && !end_html_presentation_active_) return false;
+    if (!mode_active && !end_html_presentation_active_ &&
+        !round_counts_presentation_active_) return false;
     if (!ready_ || !html_restart_fields_ok_ || !std::isfinite(now)) return false;
     auto *system = static_cast<CGameEntitySystem *>(entity_system());
     if (!system) return false;
@@ -1502,36 +1517,52 @@ bool EngineAdapter::stabilize_center_html(float now, bool round_live,
         }
         end_html_presentation_active_ = false;
     }
+    auto *round_end_count = reinterpret_cast<uint8_t *>(
+        reinterpret_cast<char *>(rules) + fields_.round_end_count);
+    auto *round_start_count = reinterpret_cast<uint8_t *>(
+        reinterpret_cast<char *>(rules) + fields_.round_start_count);
+    auto *round_end_no_music = reinterpret_cast<bool *>(
+        reinterpret_cast<char *>(rules) + fields_.round_end_no_music);
+    if (round_counts_presentation_active_) {
+        if (*round_end_count == 0) *round_end_count = round_end_count_native_;
+        if (*round_start_count == 0) *round_start_count = round_start_count_native_;
+        if (*round_end_no_music) *round_end_no_music = round_end_no_music_native_;
+        mark_state_changed(proxy, fields_.game_rules);
+        round_counts_presentation_active_ = false;
+    }
     if (!mode_active) {
-        round_ui_was_live_ = false;
-        round_ui_captured_ = false;
+        end_html_result_active_ = false;
         return true;
     }
-    // The pre-frame hook must leave native match and round state intact.
-    // m_bGameRestart also controls server simulation, not just the menu UI.
+    // Server simulation always sees its real round counters and restart state.
     if (!presentation_frame) return true;
-    if (round_end_count_field_ok_) {
-        auto *round_end_count = reinterpret_cast<uint8_t *>(
-            reinterpret_cast<char *>(rules) + fields_.round_end_count);
-        if (round_live && !round_ui_was_live_) {
-            round_end_count_before_ = *round_end_count;
-            round_ui_captured_ = true;
-        }
-        if (!round_live && round_ui_captured_ &&
-            *round_end_count != round_end_count_before_) {
-            // Preserve the live-round value so the client never constructs
-            // the stock ROUND WON and MVP panels during the result period.
-            *round_end_count = round_end_count_before_;
+    if (round_presentation_fields_ok_) {
+        // These counters recreate round_start/round_end on the client, bypassing
+        // the server event filter. Keep both at zero for the entire map: releasing
+        // the end counter at the next round replays victory music after round start,
+        // leaving the looping music track without its normal stop event.
+        round_end_count_native_ = *round_end_count;
+        round_start_count_native_ = *round_start_count;
+        round_end_no_music_native_ = *round_end_no_music;
+        if (*round_end_count || *round_start_count || !*round_end_no_music) {
+            *round_end_count = 0;
+            *round_start_count = 0;
+            *round_end_no_music = true;
+            round_counts_presentation_active_ = true;
             mark_state_changed(proxy, fields_.game_rules);
         }
     }
     const float restart_time = *restart_time_field;
     if (!std::isfinite(restart_time)) return false;
-    round_ui_was_live_ = round_live;
     // Replicate the menu state only after simulation, for live menus as well
     // as result panels. The next pre-frame hook restores the native state.
     const bool result_html = win_html_active && !round_live;
-    const float presented_time = result_html ? now - 1.0f : restart_time;
+    // Keep one deadline for the entire result period. Moving it every frame
+    // repeatedly retriggers the client's round-end presentation and music.
+    const float presented_time = result_html
+        ? (end_html_result_active_ ? end_html_presented_restart_time_ : now - 1.0f)
+        : restart_time;
+    end_html_result_active_ = result_html;
     const bool presented_restart = result_html || (round_live && restart_time < now);
     if (presented_time != restart_time || *game_restart != presented_restart) {
         end_html_restart_time_ = restart_time;
@@ -1547,6 +1578,10 @@ bool EngineAdapter::stabilize_center_html(float now, bool round_live,
     if (!logged) {
         std::fprintf(stderr, "[Shroudfire] HTML menu stabilization active (restart %.2f, time %.2f).\n",
                      restart_time, now);
+        if (round_presentation_fields_ok_)
+            std::fprintf(stderr, "[Shroudfire] Stock round audio suppression active.\n");
+        else
+            std::fprintf(stderr, "[Shroudfire] Stock round audio fields unavailable.\n");
         logged = true;
     }
     return true;

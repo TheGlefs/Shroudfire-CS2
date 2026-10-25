@@ -10,128 +10,122 @@ This edition runs as a native C++ MetaMod:Source plugin. For the SourceMod editi
 
 ## How to play
 
-Rounds last two minutes by default, with a roster that scales toward four Armitive per Invisant. Each role has separate XP, levels up to 40, upgrade points, and persistent combat rankings. The descriptions below use the supplied server defaults. Server settings can change the round length and role ratio.
+**All values below are defaults and can be adjusted with server cvars.**
+
+Rounds last **2 minutes**, with a roster that scales toward **4 Armitive per Invisant**.
 
 ### Invisant
 
-Invisible, knife-only. Armitive cannot hear your footsteps. Kill all Armitive to win. Knife: 60-degree cone, 72 units of reach, 50-75 raw damage per hit by default. Server settings can change the cone, reach, damage bounds, and attack speed.
+You're invisible and armed only with a knife. Armitive cannot hear your footsteps. **Kill all Armitive to win.**
 
-No backstab bonus; knife attacks at 66% of normal speed. Track living Armitive through walls and take no fall damage.
+- Track living Armitive through walls and take no fall damage.
+- Your knife hits in a **60° cone**, reaches **72 units**, and deals **50–75 raw damage**.
+- Knife attacks run at **66% of normal speed**, with **no backstab bonus**.
 
-After 60s of live play, 45s without dealing or taking damage starts `Starvation`. You lose 1 HP/s, increasing to 3 HP/s after 20s of continuous starvation. Starting at full health at 1:00, you die with roughly 0:15 remaining unless combat resets it. Server settings can change the delays, damage, and tick intervals.
+**Starvation:** Once 60 seconds of live play have elapsed, 45 seconds without dealing or taking damage triggers starvation. You lose **1 HP/s**, rising to **3 HP/s** after 20 seconds of continuous starvation. If it starts at full health with 1:00 left, you'll die with roughly 0:15 left unless combat resets it.
 
 ### Armitive
 
-Find the Invisant with firearms, blood, and contact. The default purchase restriction blocks the `M249`; administrators can change the list. Armitive win if anyone survives the round timer.
+Find the Invisant using firearms, blood, and contact. **Armitive win if anyone survives until time runs out.**
 
-Headshot damage to Invisant is halved and capped at 90. One headshot cannot kill a full-health Invisant.
+- The **M249** is blocked from purchase.
+- Headshot damage against Invisant is **halved and capped at 90**. One headshot cannot kill a full-health Invisant.
+- Move at least **256 units** from your tracked position to avoid camping. You'll receive a warning after **20 seconds**. After another **10 seconds**, you lose **10 HP/s** until you move away.
 
-Move at least 256 units from your tracked position to avoid camping. A warning starts after 20s; after another 10s, you lose 10 HP/s until you move away. Server settings can change the movement distance, warning and damage delays, and damage per second.
+### Role rotation
 
-### Rotation
+Roles rotate every round. Killing an Invisant as Armitive gives you priority to become Invisant next round.
 
-Roles rotate each round. An Armitive who kills an Invisant gets priority to become Invisant next round.
-
-Otherwise, the longest-waiting eligible player becomes Invisant. Suicide forfeits next-round eligibility.
+Otherwise, the longest-waiting eligible player becomes Invisant. **Suicide forfeits your eligibility for the next round.**
 
 ### Progression
 
-Kills, qualifying damage assists, and completed-round wins grant separate Invisant and Armitive XP. Server settings can change XP rewards, assist requirements, and the level progression curve.
+Armitive and Invisant each have separate **XP, levels up to 40, upgrade points, and persistent combat rankings**. Your progression carries over between sessions.
 
-As Armitive, knife kills earn 150% kill XP; pistol kills, 125%. Levels grant upgrade points. In chat, type `upgrade` for effects, `menu` to spend points, or `reset` to refund them.
+- Earn XP through kills, qualifying damage assists, and completed-round wins.
+- As Armitive, knife kills award **150% kill XP** and pistol kills award **125%**.
+- Level up to earn upgrade points.
+- Type `upgrade` for upgrade effects, `menu` to spend points, or `reset` to refund them.
 
 ### Kill streaks
 
-In 2v2+ rounds, the first enemy kill earns `First Blood`: 125% kill XP. Your second kill within 10s of the last earns 120%.
+In rounds with at least **2 players per side**, the first enemy kill earns **First Blood** and **125% kill XP**.
 
-Each later kill within 10s of your last adds 10% kill XP, up to 200% on your tenth kill. Only you hear the sounds. Server settings can change the streak window and XP bonuses.
+Your second kill within **10 seconds** of your last earns **120% kill XP**. Each additional kill within 10 seconds adds another **10 percentage points**, reaching **200% on your tenth kill**.
+
+Only you hear your kill streak sounds.
 
 ### Rank
 
-Type `rank` for your Armitive and Invisant statistics and ranks. Kills after the round ends grant no XP, rank, or role priority.
+Type `rank` to view your statistics and rankings for both roles.
 
-Default timeout behavior reveals surviving Invisant during the round transition. Servers can choose to kill them instead.
+Kills after the round ends award **no XP, rank, or role priority**. Surviving Invisant are revealed during the transition after a timeout.
 
 ## ESP and wallhacks
 
-Invisant are not made transparent. During the hunt, the server does not send Invisant players, or their weapon and movement sounds, to Armitive computers.
+Invisant aren't simply made transparent. During the hunt, the server doesn't send their player data, weapon sounds, or movement sounds to Armitive computers.
 
-ESP and wallhacks can only show data a computer receives. With no Invisant player data, they cannot reveal or track an Invisant.
+ESP and wallhacks can only display information a computer receives, so they **cannot reveal or track an Invisant** without that player data.
 
-Missed knife swings and wall impacts remain audible clues. Server settings control whether these sounds are enabled. Surviving Invisant may be deliberately revealed after timeout.
-
-Armitive still see blood and bullet impacts, and hear damage sounds.
+Missed knife swings and wall impacts remain audible clues. Armitive can also see blood and bullet impacts, and hear damage sounds. Surviving Invisant are revealed after timeout.
 
 ## Upgrades
 
-Each role has eight upgrades, with five stages per upgrade. Unlocks use your level in that role. Server settings can change unlock levels, upgrade effects, regeneration intervals, and the purchase window.
+Each role has **8 upgrades**, with **5 stages per upgrade**. Unlocks depend on your level in that role.
 
-### Unlocks
-
-Normal stages unlock at role levels 1, 5, 10, 15 and 20.
-
-Ultimate stages unlock at role levels 8, 16, 24, 32 and 40.
-
-Type `menu` to spend points or `reset` to refund them.
-
-Changes apply immediately in the opening 20s, then next round afterward.
+- **Normal stages:** levels **1, 5, 10, 15, 20**.
+- **Ultimate stages:** levels **8, 16, 24, 32, 40**.
+- Type `menu` to spend points or `reset` to refund them.
+- Changes apply immediately during the opening **20 seconds** of a round. After that, they take effect next round.
 
 ### Armitive
 
-| Upgrade | Effect |
-| --- | --- |
-| **Fortitude** | Gain 10 maximum health per stage. |
-| **Recovery** | Restore 1 health per stage every 3 seconds. |
-| **Overload** | Gain 10% extra magazine capacity per stage. |
-| **Stockpile** | Gain 1 extra reserve ammo clip per stage. |
-| **Barrage** | Gain 7% faster weapon fire rate per stage. |
-| **Control** | Gain 10% less recoil and bullet spread per stage. |
-| **Dexterity** | Gain 12% less weapon switch and reload time per stage. |
-| **Ultimate: Ward** | Press E for 2 seconds of immunity at 1/5, plus 0.5 seconds per later stage. |
+- **Fortitude:** Gain 10 maximum health per stage.
+- **Recovery:** Gain 1 health per stage every 3 seconds.
+- **Overload:** Gain 10% extra magazine capacity per stage.
+- **Stockpile:** Gain 1 extra reserve ammo clip per stage.
+- **Barrage:** Gain 7% faster weapon fire rate per stage.
+- **Control:** Gain 10% less recoil and bullet spread per stage.
+- **Dexterity:** Gain 12% less weapon switch and reload time per stage.
+- **Ultimate: Ward:** Press E for 2 seconds of immunity at 1/5, plus 0.5 seconds per later stage.
 
 ### Invisant
 
-| Upgrade | Effect |
-| --- | --- |
-| **Lightweight** | Gain 10% less gravity per stage. |
-| **Momentum** | Gain 3% faster run speed per stage. |
-| **Resilience** | Gain 15 armor per stage and helmet at 5/5. |
-| **Reforging** | Gain 1 armor per stage every 3 seconds. |
-| **Vampirism** | Gain 3 health per stage when dealing damage. |
-| **Bloodlust** | Gain 6 health per stage when killing an enemy. |
-| **Mobility** | Gain 15% faster crouching speed per stage. |
-| **Ultimate: Surge** | Press E for a 480 unit speed boost at 1/5, increased by 30 per later stage. |
+- **Lightweight:** Gain 10% less gravity per stage.
+- **Momentum:** Gain 3% faster run speed per stage.
+- **Resilience:** Gain 15 armor per stage and helmet at 5/5.
+- **Reforging:** Gain 1 armor per stage every 3 seconds.
+- **Vampirism:** Gain 3 health per stage when dealing damage.
+- **Bloodlust:** Gain 6 health per stage when killing an enemy.
+- **Mobility:** Gain 15% faster crouching speed per stage.
+- **Ultimate: Surge:** Press E for a 480 unit speed boost at 1/5, increased by 30 per later stage.
 
 ## Chat shortcuts
 
-Type these in chat without a prefix:
+Type these directly in chat **without a prefix**:
 
-| Chat text | Action |
-| --- | --- |
-| `help` | Open the gameplay guide. |
-| `menu` | Open the upgrade menu for your current role. |
-| `upgrade` | Open the upgrade guide. |
-| `reset` | Refund your current role's upgrades and open the upgrade menu. |
-| `rank` | Open your rank menu: Armitive stats, Invisant stats, and menu navigation. |
-| `audio` | Open your audio settings menu. |
-| `bugs` | Open the known bugs guide. |
-| `cheat` | Open the visibility and anti-cheat guide. |
-| `close` | Close an open upgrade menu or guide. |
+- `help` — Open the gameplay guide.
+- `menu` — Open your current role's upgrade menu.
+- `upgrade` — Open the upgrade guide.
+- `reset` — Refund your current role's upgrades and open the upgrade menu.
+- `rank` — Open your rank menu, including Armitive stats, Invisant stats, and menu navigation.
+- `audio` — Open your audio settings.
+- `bugs` — Open the known bugs guide.
+- `cheat` — Open the visibility and anti-cheat guide.
+- `close` — Close an open upgrade menu or guide.
 
 ### Menu controls
 
-The same controls work while alive or dead. Release each key before pressing it again.
+These controls work while **alive or dead**. Release each key before pressing it again.
 
-| Key | Action |
-| --- | --- |
-| A / D | Change pages. |
-| W / S | Choose an option. |
-| SPACE | Select. On an informational guide page, jump to its options. |
-| R | Jump to the final page with Exit Menu selected; press SPACE to exit. |
+- **A / D:** Change pages.
+- **W / S:** Choose an option.
+- **SPACE:** Select. On an informational guide page, jump to its options.
+- **R:** Jump to the final page with **Exit Menu** selected, then press **SPACE** to exit.
 
-An open panel takes priority over spectator controls while dead. The upgrade menu also accepts `1`–`8` in chat. Enter `sf_level` in your console to see both roles' XP and levels.
+While dead, an open panel takes priority over spectator controls. You can also choose upgrades by typing `1`–`8` in chat.
 
-`audio` provides eight persistent toggles: Round Start, Round End, Kill Streak, Starvation, Timeout, Camping, AFK, and Menu. Settings follow you across roles and sessions.
+The `audio` menu lets you toggle **Round Start, Round End, Kill Streak, Starvation, Timeout, Camping, AFK, and Menu** sounds. Your choices persist across roles and sessions.
 
 See [COMMANDS.md](COMMANDS.md) for the full command reference, administrator access, menu behavior, rankings, and server settings.
 

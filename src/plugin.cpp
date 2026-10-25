@@ -2,6 +2,7 @@
 #include "chat_hints.h"
 #include "kill_voice_hashes.h"
 #include "round_start_voice_hashes.h"
+#include "mvp_music_hashes.h"
 #include <irecipientfilter.h>
 
 #include <eiface.h>
@@ -810,6 +811,9 @@ bool ShroudfirePlugin::Load(PluginId id, ISmmAPI *ismm, char *error, size_t maxl
         can_acquire_hook_ = std::make_unique<KHook::Function<int, void *, void *, int, uint64_t>>(
             this, &ShroudfirePlugin::Hook_CanAcquire, nullptr);
         can_acquire_hook_->Configure(engine_adapter_.can_acquire_function());
+        increment_mvp_hook_ = std::make_unique<KHook::Function<void, void *, int>>(
+            this, &ShroudfirePlugin::Hook_IncrementNumMVPs, nullptr);
+        increment_mvp_hook_->Configure(engine_adapter_.increment_mvp_function());
         if (engine_adapter_.sound_filter_function()) {
             sound_filter_hook_ = std::make_unique<KHook::Function<SoundEventResult,
                 IRecipientFilter &, int, const void *>>(
@@ -889,6 +893,7 @@ bool ShroudfirePlugin::Unload(char *error, size_t maximum) {
     weapon_can_use_hook_.reset();
     can_acquire_hook_.reset();
     sound_filter_hook_.reset();
+    increment_mvp_hook_.reset();
     player_run_command_hook_.reset();
     player_run_command_target_ = nullptr;
     observer_run_command_hook_.reset();
@@ -2023,14 +2028,27 @@ KHook::Return<bool> ShroudfirePlugin::Hook_FireGameEvent(IGameEventManager2 *man
         const char *name = event->GetName();
         if (std::strcmp(name, "round_mvp") == 0 ||
             std::strcmp(name, "cs_win_panel_round") == 0 ||
-            std::strcmp(name, "round_end") == 0) {
-            // Server listeners process these events, while the client receives
-            // the custom result panel instead of the stock round summary.
+            std::strcmp(name, "round_end") == 0 ||
+            std::strcmp(name, "round_start") == 0) {
+            // Preserve server listeners while suppressing stock client round
+            // music, announcers and result panels. Shroudfire supplies its own.
             return {KHook::Action::Supersede,
                 game_event_fire_.CallOriginal(manager, event, true)};
         }
     }
     return {KHook::Action::Ignore};
+}
+
+KHook::Return<void> ShroudfirePlugin::Hook_IncrementNumMVPs(void *, int) {
+    if (!mode_.active()) return {KHook::Action::Ignore};
+    // Block the native award before it updates client MVP counters or starts a
+    // music-kit anthem. Filtering round_mvp messages alone misses this path.
+    static bool logged = false;
+    if (!logged) {
+        META_CONPRINTF("[Shroudfire] Native MVP award blocked before client playback.\n");
+        logged = true;
+    }
+    return {KHook::Action::Supersede};
 }
 
 KHook::Return<void> ShroudfirePlugin::Hook_GameEventManagerInit(IGameEventManager2 *manager) {
@@ -2391,6 +2409,13 @@ KHook::Return<void> ShroudfirePlugin::Hook_GameFramePre(IServerGameDLL *, bool s
 }
 
 KHook::Return<void> ShroudfirePlugin::Hook_GameFrame(IServerGameDLL *, bool simulating, bool, bool) {
+    if (!mvp_hook_verified_ && engine_adapter_.ready()) {
+        void *target = engine_adapter_.increment_mvp_function();
+        if (target && KHook::FindOriginal(target) != target) {
+            mvp_hook_verified_ = true;
+            META_CONPRINTF("[Shroudfire] Native MVP award hook verified; music-kit awards disabled.\n");
+        }
+    }
     for (int slot = 1; slot <= shroudfire::kMaxPlayers; ++slot)
         engine_adapter_.finish_control(slot);
     if (simulating && mode_.active()) {
@@ -2569,6 +2594,14 @@ KHook::Return<void> ShroudfirePlugin::Hook_GameFrame(IServerGameDLL *, bool simu
                 engine_adapter_.stop_sound_event_hash(slot,
                     MurmurHash2LowerCase(name, 0x53524332));
         }
+        // One cleanup pass clears an anthem started by an earlier client state.
+        if (round_win_stop_passes_ == 12) {
+            for (int slot = 1; slot <= shroudfire::kMaxPlayers; ++slot) {
+                if (!mode_.player(slot).connected || mode_.player(slot).bot) continue;
+                for (const uint32_t hash : kMvpMusicHashes)
+                    engine_adapter_.stop_sound_event_hash(slot, hash);
+            }
+        }
         --round_win_stop_passes_;
         round_win_stop_next_at_ = now + 0.1f;
     }
@@ -2578,6 +2611,8 @@ KHook::Return<void> ShroudfirePlugin::Hook_GameFrame(IServerGameDLL *, bool simu
             const auto &player = mode_.player(slot);
             if (!player.connected || player.bot) continue;
             for (const uint32_t hash : kRoundStartVoiceHashes)
+                engine_adapter_.stop_sound_event_hash(slot, hash);
+            for (const uint32_t hash : kMvpMusicHashes)
                 engine_adapter_.stop_sound_event_hash(slot, hash);
         }
         --round_start_voice_stop_passes_;
@@ -2951,7 +2986,11 @@ KHook::Return<void> ShroudfirePlugin::Hook_PostSoundEvent(IGameEventSystem *syst
         message->GetMessageId() == GE_Source1LegacyGameEvent) {
         const auto *event = message->ToPB<CMsgSource1LegacyGameEvent>();
         if (event->eventid() == game_events_->LookupEventId("cs_pre_restart") ||
-            event->eventid() == game_events_->LookupEventId("round_announce_match_start"))
+            event->eventid() == game_events_->LookupEventId("round_announce_match_start") ||
+            event->eventid() == game_events_->LookupEventId("round_start") ||
+            event->eventid() == game_events_->LookupEventId("round_end") ||
+            event->eventid() == game_events_->LookupEventId("round_mvp") ||
+            event->eventid() == game_events_->LookupEventId("cs_win_panel_round"))
             return {KHook::Action::Supersede};
     }
     if (mode_.active() && message &&
@@ -3047,6 +3086,9 @@ KHook::Return<void> ShroudfirePlugin::Hook_PostSoundEvent(IGameEventSystem *syst
         if (std::binary_search(kRoundStartVoiceHashes.begin(),
                 kRoundStartVoiceHashes.end(), sound->soundevent_hash()))
             return {KHook::Action::Supersede};
+        if (std::binary_search(kMvpMusicHashes.begin(),
+                kMvpMusicHashes.end(), sound->soundevent_hash()))
+            return {KHook::Action::Supersede};
         if (std::binary_search(kKillVoiceHashes.begin(),
                 kKillVoiceHashes.end(), sound->soundevent_hash()))
             return {KHook::Action::Supersede};
@@ -3114,7 +3156,8 @@ KHook::Return<SoundEventResult> ShroudfirePlugin::Hook_EmitSoundFilter(
             std::string name(sound);
             for (char &ch : name)
                 ch = static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
-            const bool stock_voice = name.find("ctwin") != std::string::npos ||
+            const bool stock_voice = name.rfind("music.mvpanthem.", 0) == 0 ||
+                name.find("ctwin") != std::string::npos ||
                 name.find("terwin") != std::string::npos ||
                 name.find("rounddraw") != std::string::npos ||
                 name.find("announcer.twin") != std::string::npos ||

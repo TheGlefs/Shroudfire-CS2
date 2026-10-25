@@ -47,6 +47,7 @@ public:
     void FireGameEvent(IGameEvent *event);
     KHook::Return<bool> Hook_FireGameEvent(IGameEventManager2 *, IGameEvent *event,
                                             bool dont_broadcast);
+    KHook::Return<void> Hook_IncrementNumMVPs(void *controller, int reason);
     KHook::Return<void> Hook_GameEventManagerInit(IGameEventManager2 *manager);
     KHook::Return<void> Hook_GameEventManagerInitialized(IGameEventManager2 *manager);
     KHook::Return<void> Hook_HostSay(CEntityInstance *controller, CCommand &args,
@@ -329,6 +330,8 @@ private:
     std::unique_ptr<KHook::Function<int64_t, void *, void *, void *>> damage_hook_;
     std::unique_ptr<KHook::Function<bool, void *, void *>> weapon_can_use_hook_;
     std::unique_ptr<KHook::Function<int, void *, void *, int, uint64_t>> can_acquire_hook_;
+    std::unique_ptr<KHook::Function<void, void *, int>> increment_mvp_hook_;
+    bool mvp_hook_verified_ = false;
     shroudfire::WeaponRestrictions armitive_weapon_restrictions_;
     std::unique_ptr<KHook::Function<SoundEventResult, IRecipientFilter &, int,
                                     const void *>> sound_filter_hook_;
