@@ -293,10 +293,10 @@ Shroudfire uses private CS2 engine calls. Before enabling them, the adapter chec
 
 | Platform | Server module | Size in bytes | CRC32 |
 | --- | --- | ---: | --- |
-| Windows x86-64 | `server.dll` | 34,687,128 | `42261a2c` |
-| Linux x86-64 | `libserver.so` | 41,804,088 | `86bdf70a` |
+| Windows x86-64 | `server.dll` | 34,672,792 | `16a83a46` |
+| Linux x86-64 | `libserver.so` | 41,850,680 | `6371b479` |
 
-Both adapters were reviewed for CS2 **1.41.9.2**, Steam build **26144732**.
+Both adapters were reviewed for CS2 **1.41.9.6**, Steam build **26445667**.
 
 These are the binaries accepted by this source revision. A CS2 update can leave the plugin loaded with its engine adapter disabled. If startup reports `Unsupported server module`, the adapter needs review for the new binary; `sf_enable 1`, a MetaMod update, or recompiling unchanged code cannot resolve it.
 
