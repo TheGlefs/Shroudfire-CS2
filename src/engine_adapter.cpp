@@ -126,9 +126,9 @@ namespace {
 
 // Private CS2 calls stay disabled after a game update until these builds are verified.
 #ifdef _WIN32
-// Windows CS2 1.41.9.7 (Steam build 26598758); native signatures and vtables reviewed.
-constexpr std::uintmax_t kServerSize = 34539672;
-constexpr uint32_t kServerCrc32 = 0xf1e7003c;
+// Windows CS2 1.42.0.0 (Steam build 26798866); native signatures and vtables reviewed.
+constexpr std::uintmax_t kServerSize = 34545816;
+constexpr uint32_t kServerCrc32 = 0x55d0741f;
 constexpr size_t kEntitySystemOffset = 88;
 constexpr size_t kChangeTeamVtable = 105;
 constexpr size_t kRespawnVtable = 274;
@@ -136,13 +136,13 @@ constexpr size_t kDropWeaponVtable = 28;
 constexpr size_t kSetStateChangedVtable = 28;
 constexpr size_t kCommitSuicideVtable = 387;
 constexpr size_t kTeleportVtable = 165;
-constexpr size_t kNavPhysicsVtableRva = 0x1a04b08;
+constexpr size_t kNavPhysicsVtableRva = 0x1a05e10;
 constexpr size_t kTraceShapeFilterVtable = 3;
 constexpr size_t kPointContentsVtable = 5;
 #else
-// Linux CS2 1.41.9.7 (Steam build 26598758); native signatures and vtables reviewed.
-constexpr std::uintmax_t kServerSize = 41619480;
-constexpr uint32_t kServerCrc32 = 0x434c110d;
+// Linux CS2 1.42.0.0 (Steam build 26798866); native signatures and vtables reviewed.
+constexpr std::uintmax_t kServerSize = 41628472;
+constexpr uint32_t kServerCrc32 = 0xb24e4e68;
 constexpr size_t kEntitySystemOffset = 80;
 constexpr size_t kChangeTeamVtable = 104;
 constexpr size_t kRespawnVtable = 276;
@@ -150,7 +150,7 @@ constexpr size_t kDropWeaponVtable = 29;
 constexpr size_t kSetStateChangedVtable = 29;
 constexpr size_t kCommitSuicideVtable = 387;
 constexpr size_t kTeleportVtable = 164;
-constexpr size_t kNavPhysicsVtableRva = 0x26a6e40;
+constexpr size_t kNavPhysicsVtableRva = 0x26a90e0;
 constexpr size_t kTraceShapeFilterVtable = 5;
 constexpr size_t kPointContentsVtable = 6;
 #endif
