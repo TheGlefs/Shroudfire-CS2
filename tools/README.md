@@ -11,6 +11,9 @@ Run these commands from the repository root. Python tools use the standard libra
 | Linux signature scan | `python tools/scan_linux_signatures.py <libserver.so> <gamedata.json>` | Count Linux server byte-pattern matches from a supplied game-data JSON file. A unique match does not validate ABI compatibility. |
 | Linux HUD signature scan | `python tools/scan_custom_hud_linux.py <libserver.so>` | Count matches for the script's custom HUD patterns. It does not update or enable the engine adapter. |
 | Linux update monitor | `python tools/auto_update_server.py --config <auto-update.json> [--check|--once]` | Monitor CS2, announce update restarts at 30/20/10 seconds, back up state, update Steam files, and rebuild supported adapters. Unknown native builds wait for compatibility review. See [LINUX.md](../LINUX.md#automatic-updates). |
+| Windows CS2 update watcher | `powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .\tools\watch_cs2_updates.ps1` | Open a desktop dialog when the public CS2 Steam build changes, including updates without patch notes. |
 | Windows minidump inspection | `python tools/inspect_minidump.py <dump.dmp>` | Print exception details and nearby module return addresses from a minidump. |
 
 The Linux launcher is under [configs/start-shroudfire.sh](../configs/start-shroudfire.sh). Its directory and environment-variable options are documented in [LINUX.md](../LINUX.md#start-the-server).
+
+The Windows watcher checks the [SteamCMD API](https://www.steamcmd.net/) every five minutes, even if Steam is closed. The first check saves the current public build under `%LOCALAPPDATA%\Shroudfire`. When the build changes, the dialog stays open until you dismiss it. If you start the watcher manually, leave PowerShell running and press `Ctrl+C` to stop it. Add `-Once` for a single check or `-IntervalSeconds 120` to check every two minutes.

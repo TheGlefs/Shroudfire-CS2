@@ -10,17 +10,19 @@
 #include <entity2/entitykeyvalues.h>
 #include <entity2/entitysystem.h>
 #include <schemasystem/schemasystem.h>
-#include <engine/igameeventsystem.h>
+#include <engine2/igameeventsystem.h>
+#include <engine2/igameresourceservice.h>
 #include <networksystem/inetworkmessages.h>
-#include <tier1/utlsymbollarge.h>
-#include <tier1/utlstring.h>
-#include <tier1/utlvector.h>
+#include <tier0/utlsymbollarge.h>
+#include <tier0/utlstring.h>
+#include <tier0/utlvector.h>
 #include <variant.h>
 #include <gametrace.h>
+#include <gameentitysystem.h>
 #include <igamesystemfactory.h>
 #include <igameevents.h>
 #include <irecipientfilter.h>
-#include <tier1/utlstringtoken.h>
+#include <tier0/utlstringtoken.h>
 #include "gameevents.pb.h"
 #include "usermessages.pb.h"
 #include "cstrike15_usermessages.pb.h"
@@ -41,22 +43,6 @@
 #include <cstring>
 #include <filesystem>
 #include <limits>
-
-// CS2 passes this interface when it builds the map's client resource manifest.
-// The layout follows the Source 2 game-system interface used by CS2 plugins.
-class IEntityResourceManifest {
-public:
-    virtual void AddResource(const char *) = 0;
-    virtual void AddResource(const char *, void *) = 0;
-    virtual void AddResource(const char *, void *, void *, void *) = 0;
-    virtual void Unknown04() = 0;
-    virtual void Unknown05() = 0;
-    virtual void Unknown06() = 0;
-    virtual void Unknown07() = 0;
-    virtual void Unknown08() = 0;
-    virtual void Unknown09() = 0;
-    virtual void Unknown10() = 0;
-};
 
 CBaseGameSystemFactory **CBaseGameSystemFactory::sm_pFirst = nullptr;
 
@@ -126,9 +112,9 @@ namespace {
 
 // Private CS2 calls stay disabled after a game update until these builds are verified.
 #ifdef _WIN32
-// Windows CS2 1.42.0.0 (Steam build 26798866); native signatures and vtables reviewed.
-constexpr std::uintmax_t kServerSize = 34545816;
-constexpr uint32_t kServerCrc32 = 0x55d0741f;
+// Windows CS2 1.42.0.1 (Steam build 26879581); native signatures and vtables reviewed.
+constexpr std::uintmax_t kServerSize = 34572952;
+constexpr uint32_t kServerCrc32 = 0xd310fe5e;
 constexpr size_t kEntitySystemOffset = 88;
 constexpr size_t kChangeTeamVtable = 105;
 constexpr size_t kRespawnVtable = 274;
@@ -136,13 +122,13 @@ constexpr size_t kDropWeaponVtable = 28;
 constexpr size_t kSetStateChangedVtable = 28;
 constexpr size_t kCommitSuicideVtable = 387;
 constexpr size_t kTeleportVtable = 165;
-constexpr size_t kNavPhysicsVtableRva = 0x1a05e10;
+constexpr size_t kNavPhysicsVtableRva = 0x1a0ae28;
 constexpr size_t kTraceShapeFilterVtable = 3;
 constexpr size_t kPointContentsVtable = 5;
 #else
-// Linux CS2 1.42.0.0 (Steam build 26798866); native signatures and vtables reviewed.
-constexpr std::uintmax_t kServerSize = 41628472;
-constexpr uint32_t kServerCrc32 = 0xb24e4e68;
+// Linux CS2 1.42.0.1 (Steam build 26879581); native signatures and vtables reviewed.
+constexpr std::uintmax_t kServerSize = 41630264;
+constexpr uint32_t kServerCrc32 = 0x236ea2a0;
 constexpr size_t kEntitySystemOffset = 80;
 constexpr size_t kChangeTeamVtable = 104;
 constexpr size_t kRespawnVtable = 276;
@@ -150,7 +136,7 @@ constexpr size_t kDropWeaponVtable = 29;
 constexpr size_t kSetStateChangedVtable = 29;
 constexpr size_t kCommitSuicideVtable = 387;
 constexpr size_t kTeleportVtable = 164;
-constexpr size_t kNavPhysicsVtableRva = 0x26a90e0;
+constexpr size_t kNavPhysicsVtableRva = 0x26a97e0;
 constexpr size_t kTraceShapeFilterVtable = 5;
 constexpr size_t kPointContentsVtable = 6;
 #endif
@@ -166,8 +152,8 @@ bool schema_field(ISchemaSystem *schema, const char *class_name,
 #endif
     SchemaClassInfoData_t *info = scope ? scope->FindDeclaredClass(class_name).Get() : nullptr;
     if (!info) return false;
-    for (int i = 0; i < info->m_nFieldCount; ++i) {
-        if (std::strcmp(info->m_pFields[i].m_pszName, field_name) == 0) {
+    for (int i = 0; i < info->m_nNumFields; ++i) {
+        if (std::strcmp(info->m_pFields[i].m_pName, field_name) == 0) {
             offset = info->m_pFields[i].m_nSingleInheritanceOffset;
             return true;
         }
@@ -180,8 +166,8 @@ bool global_schema_field(ISchemaSystem *schema, const char *class_name,
     CSchemaSystemTypeScope *scope = schema->GlobalTypeScope();
     SchemaClassInfoData_t *info = scope ? scope->FindDeclaredClass(class_name).Get() : nullptr;
     if (!info) return false;
-    for (int i = 0; i < info->m_nFieldCount; ++i) {
-        if (std::strcmp(info->m_pFields[i].m_pszName, field_name) == 0) {
+    for (int i = 0; i < info->m_nNumFields; ++i) {
+        if (std::strcmp(info->m_pFields[i].m_pName, field_name) == 0) {
             offset = info->m_pFields[i].m_nSingleInheritanceOffset;
             return true;
         }
@@ -390,9 +376,9 @@ bool EngineAdapter::initialize(IGameResourceService *resources, ISchemaSystem *s
         CSchemaEnumInfo *flags = scope
             ? scope->FindDeclaredEnum("TakeDamageFlags_t").Get() : nullptr;
         if (!flags) continue;
-        for (int i = 0; i < flags->m_nEnumeratorCount; ++i) {
+        for (int i = 0; i < flags->m_nNumEnumerators; ++i) {
             const auto &entry = flags->m_pEnumerators[i];
-            if (std::strcmp(entry.m_pszName, "DFLAG_IGNORE_ARMOR") == 0 &&
+            if (std::strcmp(entry.m_pName, "DFLAG_IGNORE_ARMOR") == 0 &&
                 entry.m_nValue > 0 && entry.m_nValue <= UINT32_MAX)
                 ignore_armor_damage_flag_ = static_cast<uint32_t>(entry.m_nValue);
         }
@@ -1350,7 +1336,7 @@ bool EngineAdapter::client_print(int slot, int destination, const char *message)
         !network_messages_ || !event_system_ || !message ||
         destination < 1 || destination > 6)
         return false;
-    INetworkMessageInternal *type = network_messages_->FindNetworkMessagePartial("TextMsg");
+    NetMessageInfo_t *type = network_messages_->FindNetworkMessagePartial("TextMsg");
     if (!type) return false;
     auto *data = type->AllocateMessage()->ToPB<CUserMessageTextMsg>();
     if (!data) return false;
@@ -1367,7 +1353,7 @@ bool EngineAdapter::client_print(int slot, int destination, const char *message)
 bool EngineAdapter::stop_sound_event_hash(int slot, uint32_t hash) const {
     if (!ready_ || slot < 1 || slot > 64 || !controller(slot) ||
         !network_messages_ || !event_system_) return false;
-    INetworkMessageInternal *type = network_messages_->FindNetworkMessageById(
+    NetMessageInfo_t *type = network_messages_->FindNetworkMessageById(
         GE_SosStopSoundEventHash);
     auto *data = type ? type->AllocateMessage()->ToPB<CMsgSosStopSoundEventHash>() : nullptr;
     if (!data) return false;
@@ -1451,7 +1437,7 @@ bool EngineAdapter::center_html(int slot, IGameEventManager2 *events, const char
     event->SetString(key("loc_token"), html);
     event->SetInt(key("duration"), duration_seconds);
     event->SetPlayer(key("userid"), CPlayerSlot(slot - 1));
-    INetworkMessageInternal *type = network_messages_->FindNetworkMessageById(
+    NetMessageInfo_t *type = network_messages_->FindNetworkMessageById(
         GE_Source1LegacyGameEvent);
     auto *data = type ? type->AllocateMessage()->ToPB<CMsgSource1LegacyGameEvent>() : nullptr;
     if (!data) {
@@ -1762,7 +1748,7 @@ bool EngineAdapter::hud_message(int slot, int channel, float x, float y, float h
                                 const char *message) const {
     if (!ready_ || slot < 1 || slot > 64 || !controller(slot) || !network_messages_ ||
         !event_system_ || !message) return false;
-    INetworkMessageInternal *type = network_messages_->FindNetworkMessage("CCSUsrMsg_HudMsg");
+    NetMessageInfo_t *type = network_messages_->FindNetworkMessage("CCSUsrMsg_HudMsg");
     if (!type) return false;
     auto *data = type->AllocateMessage()->ToPB<CCSUsrMsg_HudMsg>();
     if (!data) return false;

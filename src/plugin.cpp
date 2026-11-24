@@ -5,18 +5,18 @@
 #include "mvp_music_hashes.h"
 #include <irecipientfilter.h>
 
-#include <eiface.h>
+#include <engine2/ivengineserver2.h>
+#include <engine2/networkgameserverbase.h>
 #include <interfaces/interfaces.h>
 #include <schemasystem/schemasystem.h>
-#include <engine/igameeventsystem.h>
+#include <engine2/igameeventsystem.h>
 #include <entity2/entityinstance.h>
 #include <networksystem/inetworkmessages.h>
-#include <networksystem/netmessage.h>
 #include "gameevents.pb.h"
 #include "usermessages.pb.h"
 #include "cstrike15_usermessages.pb.h"
 #include "cs_usercmd.pb.h"
-#include <tier1/convar.h>
+#include <tier0/convar.h>
 #include <const.h>
 #include <in_buttons.h>
 
@@ -759,7 +759,7 @@ ShroudfirePlugin::ShroudfirePlugin()
     : game_frame_(&IServerGameDLL::GameFrame, this, &ShroudfirePlugin::Hook_GameFramePre,
                   &ShroudfirePlugin::Hook_GameFrame),
       post_sound_event_(static_cast<void (IGameEventSystem::*)(CSplitScreenSlot, bool,
-          int, const uint64 *, INetworkMessageInternal *, const CNetMessage *,
+          int, const uint64 *, NetMessageInfo_t *, const CNetMessage *,
           unsigned long, NetChannelBufType_t)>(&IGameEventSystem::PostEventAbstract),
           this, &ShroudfirePlugin::Hook_PostSoundEvent, nullptr),
       game_event_fire_(&IGameEventManager2::FireEvent, this,
@@ -2968,7 +2968,7 @@ KHook::Return<int64_t> ShroudfirePlugin::Hook_TakeDamage(void *victim, void *inf
 
 KHook::Return<void> ShroudfirePlugin::Hook_PostSoundEvent(IGameEventSystem *system,
     CSplitScreenSlot split_screen, bool local_only, int, const uint64 *recipients,
-    INetworkMessageInternal *type,
+    NetMessageInfo_t *type,
     const CNetMessage *message, unsigned long size, NetChannelBufType_t buffer_type) {
     const auto stock_chat_notice = [](std::string key) {
         std::transform(key.begin(), key.end(), key.begin(),

@@ -229,10 +229,10 @@ git clone https://github.com/alliedmodders/ambuild deps/ambuild
 python -m pip install ./deps/ambuild
 git clone --recursive https://github.com/alliedmodders/metamod-source deps/metamod-source
 git clone https://github.com/alliedmodders/hl2sdk-manifests deps/hl2sdk-manifests
-git clone --recursive --branch cs2 https://github.com/alliedmodders/hl2sdk deps/hl2sdk-cs2
+git clone --recursive --branch cs2 https://github.com/alliedmodders/s2sdk deps/hl2sdk-cs2
 ```
 
-The project requires **AMBuild 2.2 or newer** and the **`cs2` branch of HL2SDK**. Configure and compile in a separate build directory:
+The project requires **AMBuild 2.2 or newer** and the **`cs2` branch of the Source 2 SDK (`s2sdk`)**. Configure and compile in a separate build directory:
 
 ```text
 mkdir build
@@ -293,10 +293,10 @@ Shroudfire uses private CS2 engine calls. Before enabling them, the adapter chec
 
 | Platform | Server module | Size in bytes | CRC32 |
 | --- | --- | ---: | --- |
-| Windows x86-64 | `server.dll` | 34,545,816 | `55d0741f` |
-| Linux x86-64 | `libserver.so` | 41,628,472 | `b24e4e68` |
+| Windows x86-64 | `server.dll` | 34,572,952 | `d310fe5e` |
+| Linux x86-64 | `libserver.so` | 41,630,264 | `236ea2a0` |
 
-Both adapters were reviewed for CS2 **1.42.0.0**, Steam build **26798866**.
+Both adapters were reviewed for CS2 **1.42.0.1**, Steam build **26879581**. If you use MultiAddonManager for the Workshop pack, use [v1.7.5](https://github.com/Source2ZE/MultiAddonManager/releases/tag/v1.7.5) for this CS2 build.
 
 These are the binaries accepted by this source revision. A CS2 update can leave the plugin loaded with its engine adapter disabled. If startup reports `Unsupported server module`, the adapter needs review for the new binary; `sf_enable 1`, a MetaMod update, or recompiling unchanged code cannot resolve it.
 

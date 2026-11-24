@@ -12,12 +12,11 @@
 #include "weapon_restrictions.h"
 
 #include <ISmmPlugin.h>
-#include <eiface.h>
-#include <checktransmitinfo.h>
+#include <engine2/isource2server.h>
 #include <igameevents.h>
-#include <iserver.h>
+#include <engine2/inetworkserverservice.h>
 #include <playerslot.h>
-#include <tier1/convar.h>
+#include <tier0/convar.h>
 
 #include <array>
 #include <atomic>
@@ -31,7 +30,7 @@
 
 class IRecipientFilter;
 class IGameEventSystem;
-class INetworkMessageInternal;
+struct NetMessageInfo_t;
 class CNetMessage;
 
 enum class GuideKind { help, upgrades, cheat, known_bugs, audio, rank };
@@ -79,7 +78,7 @@ public:
     KHook::Return<void> Hook_ProcessMovementPost(void *services, void *move);
     KHook::Return<void> Hook_PlayerRunCommand(void *services, void *command);
     KHook::Return<void> Hook_PostSoundEvent(IGameEventSystem *, CSplitScreenSlot, bool,
-        int, const uint64 *, INetworkMessageInternal *, const CNetMessage *,
+        int, const uint64 *, NetMessageInfo_t *, const CNetMessage *,
         unsigned long, NetChannelBufType_t);
 
     void show_level(int slot);
@@ -377,7 +376,7 @@ private:
 
     KHook::Virtual<IServerGameDLL, void, bool, bool, bool> game_frame_;
     KHook::Virtual<IGameEventSystem, void, CSplitScreenSlot, bool, int, const uint64 *,
-        INetworkMessageInternal *, const CNetMessage *, unsigned long, NetChannelBufType_t>
+        NetMessageInfo_t *, const CNetMessage *, unsigned long, NetChannelBufType_t>
         post_sound_event_;
     KHook::Virtual<IGameEventManager2, bool, IGameEvent *, bool> game_event_fire_;
     KHook::Virtual<IServerGameClients, void, CPlayerSlot, bool, const char *, uint64> client_active_;

@@ -18,9 +18,6 @@ def additionalDefines(context, binary, sdk):
 
 def additionalIncludes(context, binary, sdk):
   return [
-    # Some manifest versions omit this directory on Windows even though
-    # Source 2's public convar headers include files from it directly.
-    os.path.join(sdk['path'], 'public', 'tier1'),
   ]
 
 def hasLLDLinker():
@@ -462,7 +459,7 @@ const char *PLUGIN_REVISION_COUNT = \"{revision_count}\";
       cxx.defines += ['META_IS_SOURCE2']
       binary.sources += [
         os.path.join(sdk['path'], 'public', 'tier0', 'memoverride.cpp'),
-        os.path.join(sdk['path'], 'tier1', 'convar.cpp'),
+        os.path.join(sdk['path'], 'tier0_perproject', 'convar.cpp'),
       ]
 
     SdkHelpers.configureCxx(context, binary, sdk)
